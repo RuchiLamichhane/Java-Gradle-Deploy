@@ -1,29 +1,47 @@
 pipeline {
     agent any
     
-    tools{
+    tools {
         maven "Maven3"
     }
        
     stages {
-        stage('Git Checkout-github') {
+        stage('Git Checkout') {
             steps {
-             git branch: 'main', url: 'https://github.com/Aseemakram19/maven-app.git'
+                git branch: 'main', url: 'https://github.com/RuchiLamichhane/Java-Maven-Deploy.git'
             }
         }
+        
         stage('Build') {
             steps {
-               sh 'mvn clean package'
+                sh 'mvn clean package'
             }
         }
-        stage('Create a image') {
+        
+        stage('Create Docker Image') {
             steps {
-               sh 'docker build -t aseem1 .'
+                sh 'docker build -t javaapp .'
             }
         }
-        stage('Docker Container app') {
+        
+        stage('Check Port') {
             steps {
-               sh 'docker run -d -p 9000:8080 -t aseem1'
+                script {
+                    def portStatus = sh(script: 'netstat -tuln | grep ":9000"', returnStatus: true)
+                    if (portStatus == 0) {
+                        echo "Port 9000 is in use, stopping and removing the existing container"
+                        sh 'docker stop javaapp_container'
+                        sh 'docker rm javaapp_container'
+                    } else {
+                        echo "Port 9000 is available"
+                    }
+                }
+            }
+        }
+        
+        stage('Run Docker Container') {
+            steps {
+                sh 'docker run -d -p 9000:8080 --name javaapp_container -t javaapp'
             }
         }
     }
