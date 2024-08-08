@@ -3,7 +3,7 @@
 1) Maven - Build tool.
 2) Git Hub - SCM
 3) Jenkins - CICD TOOL
-4) Docker _ container
+4) Docker - container
 5) Nginx -  Webserver
 6) SSL - cerbot
 
